@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from pymongo import MongoClient
+import os
 
 app = Flask(__name__)
 
@@ -8,20 +9,25 @@ client = MongoClient(mongo_uri)
 db = client.data
 collection = db.personas
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
-@app.route("/addPerson", methods=["POST"])
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/addPerson', methods=['POST'])
 def add_person():
     data = request.get_json()
     collection.insert_one(data)
     return jsonify({"message": "Persona agregada exitosamente"})
 
-@app.route("/getPeople")
+@app.route('/getPeople')
 def get_people():
     people = list(collection.find())
     return jsonify(people)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
+
