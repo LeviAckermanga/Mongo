@@ -8,7 +8,7 @@ db = client.data
 
 collection = db.personas  
 
-new_doc = {"name": "Branko", "email": "branko@.cl", "age": 23}
+new_doc = {"name": "Diego", "email": "diego@.cl", "age": 23}
 collection.insert_one(new_doc)
 
 cursor = collection.find()
