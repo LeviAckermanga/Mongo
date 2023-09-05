@@ -5,20 +5,24 @@
     <link rel="stylesheet" type="text/css" href="static/styles.css">
 
 </head>
-<body>
-    <h1>Aplicación MongoDB</h1>
-    <form id="data-form">
-        <label for="name">Nombre:</label>
-        <input type="text" id="name" name="name" required><br><br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br><br>
-        <label for="age">Edad:</label>
-        <input type="number" id="age" name="age" required><br><br>
-        <button type="submit">Agregar Persona</button>
+<body style="font-family: Arial, sans-serif; margin: 20px;">
+    <h1 style="color: #333;">Aplicación MongoDB</h1>
+    <form id="data-form" style="border: 1px solid #ccc; padding: 20px; width: 300px;">
+        <label for="name" style="display: block; margin-bottom: 5px;">Nombre:</label>
+        <input type="text" id="name" name="name" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br><br>
+        <label for="email" style="display: block; margin-bottom: 5px;">Email:</label>
+        <input type="email" id="email" name="email" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br><br>
+        <label for="age" style="display: block; margin-bottom: 5px;">Edad:</label>
+        <input type="number" id="age" name="age" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br><br>
+        <button type="submit" style="background-color: #007bff; background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;color: white; padding: 10px 20px; border: none; cursor: pointer;">Agregar Persona</button>
     </form>
     
-    <h2>Personas</h2>
-    <ul id="people-list">
+    <h2 style="color: #333;">Personas</h2>
+    <ul id="people-list" style="list-style: none; padding: 0;">
     </ul>
 
     <script src="static/app.js"></script>
