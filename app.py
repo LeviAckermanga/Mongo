@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from pymongo import MongoClient
+from bson import ObjectId  
 import os
 
 app = Flask(__name__)
@@ -26,6 +27,8 @@ def add_person():
 @app.route('/getPeople')
 def get_people():
     people = list(collection.find())
+    for person in people:
+        person['_id'] = str(person['_id'])
     return jsonify(people)
 
 if __name__ == '__main__':
