@@ -26,10 +26,3 @@ jobs:
       run: |
         python db.py
 
-    - name: Push changes (if needed)
-      run: |
-        git config --local user.email "https://github.com/LeviAckermanga/Mongo.git"
-        git config --local user.name "LeviAckermanga"
-        git add .
-        git commit -m "Commit"
-        git push
