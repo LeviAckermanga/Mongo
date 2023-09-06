@@ -1,0 +1,35 @@
+name: MongoDB Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x 
+
+    - name: Install dependencies
+      run: |
+        pip install pymongo
+
+    - name: Run MongoDB script
+      run: |
+        python db.py
+
+    - name: Push changes (if needed)
+      run: |
+        git config --local user.email "https://github.com/LeviAckermanga/Mongo.git"
+        git config --local user.name "LeviAckermanga"
+        git add .
+        git commit -m "Commit"
+        git push
