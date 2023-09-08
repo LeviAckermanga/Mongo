@@ -3,9 +3,13 @@ from pymongo import MongoClient
 from bson import ObjectId  
 import os
 
-app = Flask(__name__)
+from config import MONGO_URI, SECRET_KEY
 
-mongo_uri = "mongodb+srv://LeviAckerman:2MtDBdH6G8GLuLIR@cluster1.an9fxsr.mongodb.net/?retryWrites=true&w=majority"
+app = Flask(__name__)
+app.config['MONGO_URI'] = MONGO_URI
+app.config['SECRET_KEY'] = SECRET_KEY
+
+mongo_uri = app.config['MONGO_URI']
 client = MongoClient(mongo_uri)
 db = client.data
 collection = db.personas
