@@ -1,0 +1,25 @@
+pipeline {
+    agent {
+        docker {
+            image 'jenkins-agent:latest'
+        }
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/LeviAckermanga/Mongo.git']]])
+            }
+        }
+        stage('Dependencies') {
+            steps {
+                sh 'pip install pymongo'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'python3 db.py'
+            }
+        }
+    }
+}
