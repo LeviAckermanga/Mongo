@@ -1,0 +1,27 @@
+pipeline {
+    agent {
+        dockerfile { args '--privileged --network=host'}
+    }
+
+    stages {
+        stage('Azure Login') {
+            steps {
+                script {
+                    env.AZURE_CONFIG_DIR = "${WORKSPACE}/azure-config"
+
+                    withCredentials(bindings: [azureServicePrincipal('devServicePrincipal')]) {
+                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+                    sh 'az webapp create -g $RS -p $PLAN -n $APP -i sociuswebapptest009/myapp:latest'
+                    }
+                }
+            }
+        }
+    }
+
+    parameters {
+        string (name:'APP',defaultValue:'sociuswebapptest009',description:'Nombre Web')
+        string (name:'RS',defaultValue:'SOCIUSRGLAB-RG-MODELODEVOPS-DEV',description:'Resources')
+        string (name:'PLAN',defaultValue:'Plan-SociusRGLABRGModeloDevOpsDockerDev', description:'Plan servicio')
+    }
+
+}
