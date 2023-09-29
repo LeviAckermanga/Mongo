@@ -1,26 +1,21 @@
 pipeline {
     agent {
-        docker {
-            image 'diegoriquelme/diegoimage'
-        }
+         dockerfile { args '--privileged --network=host'}
     }
 
     stages {
-         stage('GitTag') {
+        stage('Listar') {
             steps {
-                script {
-                    def gitTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-                }
+                sh 'ls -l'
             }
-         }
-
+        }
+            
         stage('Build') {
             environment {
                 dockerTool = tool 'docker'
-                gitTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
             }
             steps {
-                sh "${dockerTool}/bin/docker build -t diegoriquelme/myapp:{$gitTag} ."
+                sh '${dockerTool}/bin/docker build -t diegoriquelme/myapp:latest .'
             }
         }
 
@@ -30,35 +25,28 @@ pipeline {
                 dockerTool = tool 'docker'
                 dockerUser = credentials('DiegoDocker')
                 azureUser = credentials('AzureDiego')
-                gitTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
             }
             steps {
                 sh '${dockerTool}/bin/docker login -u $dockerUser_USR -p $dockerUser_PSW'
                 sh '${dockerTool}/bin/docker login -u $azureUser_USR -p $azureUser_PSW diegoriquelme.azurecr.io'
-                sh '${dockerTool}/bin/docker tag diegoriquelme/myapp:{$gitTag} diegoriquelme.azurecr.io/myapp:{$gitTag}'
-                sh '${dockerTool}/bin/docker push diegoriquelme.azurecr.io/myapp:{$gitTag}'
-                sh '${dockerTool}/bin/docker rmi -f diegoriquelme/myapp:{$gitTag}'
+                sh '${dockerTool}/bin/docker tag diegoriquelme/myapp:latest diegoriquelme.azurecr.io/myapp:latest'
+                sh '${dockerTool}/bin/docker push diegoriquelme.azurecr.io/myapp:latest'
+                sh '${dockerTool}/bin/docker rmi -f diegoriquelme/myapp:latest'
                 sh '${dockerTool}/bin/docker logout'
             }
         }
         stage('Azure') {
             environment {
                 azureUser = credentials('AzureDiego')
-                gitTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
             }
             steps {
                 script {
                     env.AZURE_CONFIG_DIR = "${WORKSPACE}/azure-config"
                     withCredentials(bindings: [azureServicePrincipal('devServicePrincipal')]) {
                         sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
-                        sh "az webapp config container set --name $APP --resource-group $RS --docker-custom-image-name diegoriquelme.azurecr.io/myapp:{$gitTag} --docker-registry-server-url https://diegoriquelme.azurecr.io --docker-registry-server-user $azureUser_USR --docker-registry-server-password $azureUser_PSW"
+                        sh "az webapp config container set --name $APP --resource-group $RS --docker-custom-image-name diegoriquelme.azurecr.io/myapp:latest --docker-registry-server-url https://diegoriquelme.azurecr.io --docker-registry-server-user $azureUser_USR --docker-registry-server-password $azureUser_PSW"
                     }
                 }
-            }
-        }
-        stage('Listar') {
-            steps {
-                sh 'ls -l'
             }
         }
     }

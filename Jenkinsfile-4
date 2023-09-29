@@ -1,27 +1,41 @@
 pipeline {
+    parameters {
+        string(name:'PLAN',defaultValue:'Plan-SociusRGLABRGModeloDevOpsDockerDev',description:'Plan del servicio')
+        string(name:'APP_NAME',defaultValue:'sociuswebapptest009',description:'Nombre de la webapp')
+        string(name:'RES_GRP',defaultValue:'SOCIUSRGLAB-RG-MODELODEVOPS-DEV',description:'Grupo de recursos')
+    }
+    
     agent {
         dockerfile { args '--privileged --network=host'}
     }
-
-    stages {
-        stage('Azure Login') {
+    
+    stages {      
+        stage('Azure Login & ContainerImage Push ACR') {
+            environment {
+                dockerTool = tool 'docker'
+                dockerHub = credentials('DiegoDocker')
+                azureUs = credentials('AzureDiego')
+            }
             steps {
                 script {
-                    env.AZURE_CONFIG_DIR = "${WORKSPACE}/azure-config"
-
                     withCredentials(bindings: [azureServicePrincipal('devServicePrincipal')]) {
-                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
-                    sh 'az webapp create -g $RS -p $PLAN -n $APP -i sociuswebapptest009/myapp:latest'
+                        sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+                        sh '${dockerTool}/bin/docker login -u $dockerHub_USR -p $dockerHub_PSW'
+                        sh '${dockerTool}/bin/docker login -u $azureUs_USR -p $azureUs_PSW diegoriquelme.azurecr.io'
+                        echo '- Logeado en DockerHub -'
+                        sh '${dockerTool}/bin/docker build -t diegoriqueme/myapp:latest .'
+                        sh '${dockerTool}/bin/docker push diegoriqueme/myapp:latest'
+                        sh '${dockerTool}/bin/docker tag diegoriqueme/myapp:latest diegoriquelme.azurecr.io/myapp:latest'
+                        sh '${dockerTool}/bin/docker push diegoriquelme.azurecr.io/myapp:latest'
+                        sh '${dockerTool}/bin/docker rmi -f diegoriqueme/myapp:latest'
+                        sh '${dockerTool}/bin/docker logout'
+                        echo '- Image Push Realizado Correctamente -' 
+                        sh 'az webapp config container set --name $APP_NAME --resource-group $RES_GRP --docker-custom-image-name diegoriquelme.azurecr.io/myapp:latest --docker-registry-server-url https://diegoriquelme.azurecr.io --docker-registry-server-user $azureUs_USR --docker-registry-server-password $azureUs_PSW'
+                        echo '- Imagen de Contenedor modificada correctamente -'
                     }
                 }
             }
         }
+        
     }
-
-    parameters {
-        string (name:'APP',defaultValue:'sociuswebapptest009',description:'Nombre Web')
-        string (name:'RS',defaultValue:'SOCIUSRGLAB-RG-MODELODEVOPS-DEV',description:'Resources')
-        string (name:'PLAN',defaultValue:'Plan-SociusRGLABRGModeloDevOpsDockerDev', description:'Plan servicio')
-    }
-
 }
