@@ -1,6 +1,8 @@
 pipeline {
     agent {
-         dockerfile { args '--privileged --network=host'}
+         docker {
+            image 'diegoriquelme/diegoimage'
+        }
     }
 
     stages {
