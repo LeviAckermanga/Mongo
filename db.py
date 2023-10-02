@@ -1,8 +1,8 @@
+from config import MONGO_URI, SECRET_KEY
 from pymongo import MongoClient
 
-mongo_uri = "mongodb+srv://LeviAckerman:2MtDBdH6G8GLuLIR@cluster1.an9fxsr.mongodb.net/?retryWrites=true&w=majority"
 
-client = MongoClient(mongo_uri)
+client = MongoClient(MONGO_URI)
 
 db = client.data 
 
@@ -16,3 +16,5 @@ for document in cursor:
     print(document)
 
 client.close()
+
+print("Clave secreta:", SECRET_KEY)
