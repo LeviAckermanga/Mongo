@@ -34,7 +34,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         data.forEach((person) => {
             const li = document.createElement("li");
-            li.textContent = `${person.name} (${person.age} años) - ${person.email}`;
+            let text = `${person.name}`;
+
+            if (person.age) {
+                text += ` (${person.age} años)`;
+            }
+
+            if (person.email) {
+                text += ` - ${person.email}`;
+            }
+
+            li.textContent = text;
             peopleList.appendChild(li);
         });
     }

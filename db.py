@@ -8,8 +8,8 @@ db = client.data
 
 collection = db.personas  
 
-new_doc = {"name": "Diego", "email": "diego@.cl", "age": 23}
-collection.insert_one(new_doc)
+# new_doc = {"name": "", "email": "", "age": ""}
+# collection.insert_one(new_doc)
 
 cursor = collection.find()
 for document in cursor:
