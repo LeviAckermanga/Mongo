@@ -12,6 +12,7 @@ pipeline {
                 script {
                     def gitTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
                     echo " ** Git Tag Version: ${gitTag}"
+                    sh "git tag -f latest"
                 }
             }
          }
@@ -22,7 +23,7 @@ pipeline {
                 gitTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
             }
             steps {
-                sh "${dockerTool}/bin/docker build -t diegoriquelme/myapp:$gitTag ."
+                sh "${dockerTool}/bin/docker build -t diegoriquelme/myapp:$gitTag -t diegoriquelme/myapp:latest ."
             }
         }
 
@@ -38,8 +39,11 @@ pipeline {
                 sh '${dockerTool}/bin/docker login -u $dockerUser_USR -p $dockerUser_PSW'
                 sh '${dockerTool}/bin/docker login -u $azureUser_USR -p $azureUser_PSW diegoriquelme.azurecr.io'
                 sh '${dockerTool}/bin/docker tag diegoriquelme/myapp:$gitTag diegoriquelme.azurecr.io/myapp:$gitTag'
+                sh '${dockerTool}/bin/docker tag diegoriquelme/myapp:latest diegoriquelme.azurecr.io/myapp:latest'
                 sh '${dockerTool}/bin/docker push diegoriquelme.azurecr.io/myapp:$gitTag'
+                sh '${dockerTool}/bin/docker push diegoriquelme.azurecr.io/myapp:latest'
                 sh '${dockerTool}/bin/docker rmi -f diegoriquelme/myapp:$gitTag'
+                sh '${dockerTool}/bin/docker rmi -f diegoriquelme/myapp:latest'
                 sh '${dockerTool}/bin/docker logout'
             }
         }
