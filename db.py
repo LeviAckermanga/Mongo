@@ -1,15 +1,19 @@
-from config import MONGO_URI, SECRET_KEY
+#from config import MONGO_URI, SECRET_KEY
 from pymongo import MongoClient
+import os 
 
+mongo_url = os.environ.get('MONGO_URL')
 
-client = MongoClient(MONGO_URI)
+if mongo_url is None:
+    raise ValueError("La variable de entorno MONGO_URL no está configurada.")
+
+client = MongoClient('MONGO_URL')
+
+#client = MongoClient(MONGO_URI)
 
 db = client.data 
 
 collection = db.personas  
-
-# new_doc = {"name": "", "email": "", "age": ""}
-# collection.insert_one(new_doc)
 
 cursor = collection.find()
 for document in cursor:
@@ -17,4 +21,3 @@ for document in cursor:
 
 client.close()
 
-print("Clave secreta:", SECRET_KEY)
